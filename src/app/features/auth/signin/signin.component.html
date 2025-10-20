@@ -1,0 +1,164 @@
+<div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-surface to-background">
+  <div class="w-full max-w-md animate-fade-in">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-full mb-4">
+        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold mb-2">Bienvenido</h1>
+      <p class="text-textSecondary">Inicia sesión en tu cuenta</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card">
+      <form [formGroup]="signForm" (ngSubmit)="onSubmit()">
+        <!-- Email -->
+        <div class="mb-4">
+          <label class="label">Correo Electrónico</label>
+          <input
+            type="email"
+            formControlName="email"
+            name="email"
+            class="input"
+            placeholder="tu@email.com"
+            required
+            [attr.disabled]="loading ? true : null"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="mb-6">
+          <label class="label">Contraseña</label>
+          <div class="relative">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              name="password"
+              class="input pr-12"
+              placeholder="••••••••"
+              required
+              [attr.disabled]="loading ? true : null"
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-textSecondary hover:text-text transition-colors"
+              [attr.disabled]="loading ? true : null"
+            >
+              @if(!showPassword){
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              }
+              @if(showPassword){
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- Reset Link -->
+        <div class="mb-4">
+          <p class="text-textSecondary text-sm">
+            ¿Olvidaste la contraseña?
+            <button type="button"
+                  (click)="openResetModal()" 
+                  class="text-primary hover:text-primary/80 font-medium transition-colors">
+              Ingresa aquí
+            </button>
+          </p>
+        </div>
+
+        <!-- Modal Reset Password -->
+        @if(showResetModal) {
+          <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div class="bg-surface p-6 rounded-2xl w-full max-w-sm shadow-lg animate-fade-in">
+              <h2 class="text-xl font-semibold mb-4 text-center text-text">Restablecer contraseña</h2>
+              <!-- Form Reset -->
+              <form  [formGroup]="resetForm"  (ngSubmit)="sendResetLink()">
+                <input formControlName="resetEmail" type="email" placeholder="Ingresa tu correo" class="input w-full mb-4" />
+            
+                <button type="submit" class="btn btn-primary w-full mb-2" [disabled]="loadingReset">
+                  @if(!loadingReset){
+                    <span >Enviar enlace</span>
+                  }
+                  @if(loadingReset)  {
+                    <span class="flex items-center justify-center">
+                      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                      </svg>
+                      Enviando...
+                    </span>
+                  }
+                </button>
+            
+                <button type="button" (click)="closeResetModal()" class="w-full text-sm text-textSecondary hover:text-text mt-2">
+                  Cancelar
+                </button>
+            
+                <!-- Mensajes -->
+                @if(resetSuccess){
+                  <p class="text-green-500 mt-3 text-sm text-center">
+                    {{ resetSuccess }}
+                  </p>
+                }
+                @if(resetError){
+                  <p class="text-red-500 mt-3 text-sm text-center">
+                    {{ resetError }}
+                  </p>
+                }
+              </form>  
+
+            </div>
+          </div>
+        }
+
+        <!-- Error Message -->
+        @if(error){
+          <div class="mb-4 p-3 bg-error/10 border border-error/20 rounded-lg">
+            <p class="text-error text-sm">{{ error }}</p>
+          </div>
+        }
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="btn btn-primary w-full mb-4"
+          [disabled]="loading"
+        >
+          @if(!loading){
+            <span >Iniciar Sesión</span>
+          }
+          @if(loading)  {
+            <span class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Iniciando sesión...
+            </span>
+          }
+        </button>
+
+        <!-- Sign Up Link -->
+        <div class="text-center">
+          <p class="text-textSecondary text-sm">
+            ¿No tienes una cuenta?
+            <a routerLink="/auth/signup" 
+                class="text-primary hover:text-primary/80 font-medium transition-colors">
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
