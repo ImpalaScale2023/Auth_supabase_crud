@@ -1,39 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { MaintenanceCompaniesComponent } from './maintenance/maintenance.component';
+import { Company } from '@app/core/models/database.types';
+import { CompanyService } from '@app/core/services/company.service';
+
 
 @Component({
   selector: 'app-companies',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="min-h-screen bg-background p-8">
-      <div class="max-w-7xl mx-auto">
-        <div class="flex items-center justify-between mb-8">
-          <div>
-            <h1 class="text-3xl font-bold mb-2">Gestión de Empresas</h1>
-            <p class="text-textSecondary">Administra empresas y sucursales</p>
-          </div>
-          <button (click)="goBack()" class="btn btn-outline">
-            ← Volver al Dashboard
-          </button>
-        </div>
-        
-        <div class="card text-center py-12">
-          <svg class="w-16 h-16 text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-          </svg>
-          <h2 class="text-xl font-bold mb-2">Módulo de Empresas</h2>
-          <p class="text-textSecondary">Funcionalidad en desarrollo</p>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './companies.component.html'
 })
 export class CompaniesComponent {
-  constructor(private router: Router) {}
+  companies = signal<Company[]>([]);
+  isLoading = signal<boolean>(false);
+  isEditing = signal<boolean>(false);
+  isModalOpen = signal<boolean>(false);
+  viewMode= signal<'cards' | 'list'>('list');
+
+  private _companyService =  inject(CompanyService);
+  private _router = inject(Router);
+  
+  constructor() {}
+  
+  async loadCompanies() {
+    this.isLoading.set(true);
+    try {
+      this.companies.set(await this._companyService.getCompanies());
+    } catch (error) {
+      console.error('Error loading companies:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  ngAfterViewInit(){
+    this.loadCompanies();
+  }
+
+   openModal(company?: Company) {
+    if (company) {
+      this.isEditing.set(true);
+      // this.selectedCompany = company;
+      // this.formData = { ...company };
+      // this.previewUrl = company.logo_url || null;
+    } else {
+      //Nuevo ingreso
+      this.isEditing.set(false);
+      // this.selectedCompany = null;
+      // this.resetForm();
+    }
+    this.isModalOpen.set(true);
+  };
+
+  toggleViewMode() {
+    this.viewMode.update(()=> this.viewMode() === 'cards' ? 'list' : 'cards');
+  }
+
   
   goBack() {
-    this.router.navigate(['/dashboard']);
+    this._router.navigate(['/dashboard']);
   }
 }

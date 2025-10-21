@@ -3,7 +3,11 @@ export interface Company {
   name: string;
   identifier?: string;
   logo_url?: string;
+  description: string;
+  email: string;
+  phone: string;
   metadata?: any;
+  address: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;

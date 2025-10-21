@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { UserService } from '@app/core/services/user.service';
 import { AppUser, UserRoleView } from '@app/core/models/database.types';
@@ -8,7 +8,7 @@ import { AppUser, UserRoleView } from '@app/core/models/database.types';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit {
